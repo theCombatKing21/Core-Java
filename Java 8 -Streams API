@@ -1,0 +1,298 @@
+GFG link - https://www.geeksforgeeks.org/java/stream-in-java/
+
+The Java 8 Streams API, part of the java.util.stream package, provides a functional and declarative way to process sequences of elements. Unlike collections, streams do not store data; they are a pipeline for processing data from a source like a collection, array, or I/O channel. 
+GeeksforGeeks
+GeeksforGeeks
+
+Core Concepts
+Not a Data Structure: It does not store elements; it just conveys them from a source through a pipeline of operations.
+Functional in Nature: Operations on a stream produce a result but do not modify the original data source.
+Lazy Evaluation: Intermediate operations are not executed until a terminal operation is invoked.
+Consumable: A stream can only be traversed once. To process the same data again, you must create a new stream. 
+
+
+The Stream Pipeline
+A stream operation is composed of three main parts: 
+Source: Where the data comes from (e.g., list.stream(), Arrays.stream(array), or Files.lines()).
+Intermediate Operations: Transformations that return a new stream. These can be chained.
+filter(Predicate): Filters elements based on a condition.
+map(Function): Transforms each element into another value.
+flatMap(Function): Flattens a stream of streams into a single stream.
+sorted(): Sorts elements.
+distinct(): Removes duplicate elements.
+Terminal Operation: Triggers the pipeline and produces a final result or a side-effect.
+collect(): Converts the stream back into a collection like a List or Set.
+forEach(Consumer): Performs an action for each element.
+reduce(): Combines elements into a single value (e.g., sum, average).
+count(): Returns the number of elements. 
+
+Specialized Streams
+For better performance with primitive types and to avoid the overhead of auto-boxing, Java 8 includes specialized streams: 
+Oracle Help Center
+Oracle Help Center
+
+IntStream for primitive int.
+LongStream for primitive long.
+DoubleStream for primitive double
+
+---------------------------------------------------
+
+🚀 map vs flatMap (Simple Intuition)
+✅ 🔹 map() → “Transform each element”
+Takes one element → gives one element
+Structure stays the same
+
+👉 Think: “apply a function to each item”
+
+🔹 Example
+List<Integer> list = Arrays.asList(1, 2, 3);
+
+list.stream()
+    .map(x -> x * 2)
+    .forEach(System.out::println);
+
+👉 Output:
+
+2
+4
+6
+
+✔ Each element → transformed → same count
+
+🚀 Now the Problem Case
+
+What if you have nested data?
+
+List<List<Integer>> list = Arrays.asList(
+    Arrays.asList(1, 2),
+    Arrays.asList(3, 4)
+);
+🔹 Using map()
+list.stream()
+    .map(x -> x.stream())
+    .forEach(System.out::println);
+
+👉 Output:
+
+Stream object
+Stream object
+
+👉 Because:
+
+Each list → converted to a Stream
+Result = Stream<Stream<Integer>> ❌ (nested)
+🚀 flatMap() to the Rescue
+✅ 🔹 flatMap() → “Flatten + Transform”
+Takes one element → gives multiple elements
+Flattens nested structure
+
+👉 Think: “open the box and take out items”
+
+🔹 Example
+list.stream()
+    .flatMap(x -> x.stream())
+    .forEach(System.out::println);
+
+👉 Output:
+
+1
+2
+3
+4
+
+✔ Nested list → flattened into single stream
+
+🧠 Super Simple Analogy
+
+👉 Imagine:
+
+You have:
+
+[ [Apple, Banana], [Orange, Mango] ]
+🔹 map()
+
+👉 Keeps boxes
+
+[ Box1, Box2 ]
+🔹 flatMap()
+
+👉 Opens boxes and merges
+
+[ Apple, Banana, Orange, Mango ]
+🚀 Key Difference (Interview Answer)
+map()	flatMap()
+One-to-one	One-to-many
+Keeps structure	Flattens structure
+Output: Stream<T>	Output: Stream<T> (flattened)
+🚀 When to Use What?
+✅ Use map()
+Simple transformation
+Example: square numbers, uppercase strings
+✅ Use flatMap()
+Nested collections
+Streams inside streams
+Example: list of lists, list of objects with lists
+🚀 Interview Questions (Direct)
+🔥 Q: Difference between map and flatMap?
+
+👉 Answer:
+
+map() transforms each element into another element → keeps structure
+flatMap() transforms and flattens nested structures → avoids Stream<Stream>
+🔥 Q: When will you use flatMap?
+
+👉 When dealing with:
+
+Nested collections
+One-to-many transformations
+🚀 One Real Interview Example
+class Employee {
+    List<String> skills;
+}
+🔹 Get all skills
+employees.stream()
+    .flatMap(emp -> emp.getSkills().stream())
+    .forEach(System.out::println);
+
+✔ This is a classic interview use-case
+
+🔥 Final Memory Trick
+
+👉
+
+map = 1 → 1
+flatMap = 1 → many (flatten)
+---------------------------------------------------
+
+Java Streams — Everything You Need for Interviews
+
+What is a Stream?
+Think of a Stream as a pipeline through which your data flows and gets processed. It is not a data structure — it does not store data. It takes data from a source (like a List or array), passes it through a series of operations, and produces a result.
+The mental model is a factory assembly line: raw materials come in one end, go through multiple processing stations, and a finished product comes out the other end.
+javaList<String> names = List.of("Alice", "Bob", "Charlie", "Anna");
+
+List<String> result = names.stream()          // source: creates the pipeline
+    .filter(n -> n.startsWith("A"))           // station 1: filter
+    .map(String::toUpperCase)                 // station 2: transform
+    .collect(Collectors.toList());            // end: collect the result
+
+// result: ["ALICE", "ANNA"]
+Three important properties to always remember: streams are not reusable (once consumed, done), they are lazy (nothing runs until a terminal operation is called), and they do not modify the source (the original list is untouched).
+
+Ways to Create a Stream
+java// 1. From a Collection — most common
+List<String> list = List.of("a", "b", "c");
+Stream<String> s1 = list.stream();
+Stream<String> s2 = list.parallelStream(); // parallel version
+
+// 2. From individual values — Stream.of()
+Stream<String> s3 = Stream.of("x", "y", "z");
+
+// 3. From an array
+String[] arr = {"a", "b", "c"};
+Stream<String> s4 = Arrays.stream(arr);
+
+// 4. Infinite streams — generate() and iterate()
+Stream<Double> randoms = Stream.generate(Math::random);  // infinite: keep producing
+Stream<Integer> numbers = Stream.iterate(0, n -> n + 2); // infinite: 0, 2, 4, 6...
+// Always use limit() with infinite streams or you'll loop forever
+Stream<Integer> first10Even = Stream.iterate(0, n -> n + 2).limit(10);
+
+// 5. Primitive streams — avoids boxing overhead
+IntStream range = IntStream.range(1, 6);       // 1, 2, 3, 4, 5 (excludes 6)
+IntStream rangeClosed = IntStream.rangeClosed(1, 5); // 1, 2, 3, 4, 5 (includes 5)
+
+Intermediate vs Terminal Operations — The Core Concept
+This is the most important conceptual distinction in Streams. Every operation is either one or the other.
+Intermediate operations are lazy — they just describe what should happen but don't actually run anything. They return another Stream, which is why you can chain them. filter(), map(), sorted(), distinct(), limit(), skip(), flatMap(), peek() — all intermediate.
+Terminal operations are what actually trigger the pipeline to run. Once called, the stream is consumed and cannot be used again. collect(), forEach(), reduce(), count(), findFirst(), findAny(), anyMatch(), allMatch(), noneMatch(), min(), max(), toArray() — all terminal.
+A stream with only intermediate operations and no terminal operation does absolutely nothing. This catches people off guard.
+java// This does NOTHING — no terminal operation
+names.stream().filter(n -> n.startsWith("A")).map(String::toUpperCase);
+
+// This runs — collect() is the terminal operation that triggers everything
+List<String> result = names.stream()
+    .filter(n -> n.startsWith("A"))
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+
+The Important Intermediate Operations
+filter(Predicate) — keeps elements that satisfy a condition.
+javaList<Integer> evens = List.of(1,2,3,4,5).stream()
+    .filter(n -> n % 2 == 0)
+    .collect(Collectors.toList()); // [2, 4]
+map(Function) — transforms each element into something else. The stream type can change.
+javaList<Integer> lengths = List.of("Alice", "Bob").stream()
+    .map(String::length)           // Stream<String> → Stream<Integer>
+    .collect(Collectors.toList()); // [5, 3]
+flatMap(Function) — this one trips people up. Use it when each element maps to a collection, and you want to flatten all those collections into one single stream. Think of it as map + flatten.
+javaList<List<Integer>> nested = List.of(List.of(1,2), List.of(3,4), List.of(5));
+
+List<Integer> flat = nested.stream()
+    .flatMap(Collection::stream)   // each inner List becomes a Stream, then all merged
+    .collect(Collectors.toList()); // [1, 2, 3, 4, 5]
+sorted() — natural order. sorted(Comparator) — custom order.
+javaList<String> sorted = List.of("Banana", "Apple", "Cherry").stream()
+    .sorted()                              // alphabetical
+    .collect(Collectors.toList());         // [Apple, Banana, Cherry]
+
+// Custom sort by length
+List<String> byLength = List.of("Banana", "Kiwi", "Apple").stream()
+    .sorted(Comparator.comparingInt(String::length))
+    .collect(Collectors.toList());         // [Kiwi, Apple, Banana]
+distinct() removes duplicates using equals(). limit(n) takes only the first n elements. skip(n) skips the first n elements. These are straightforward.
+peek(Consumer) — used for debugging. It lets you look at elements as they flow through the pipeline without changing them. Never use it for real logic — it's purely for inspecting intermediate state during development.
+javaList.of(1,2,3,4).stream()
+    .filter(n -> n > 2)
+    .peek(n -> System.out.println("After filter: " + n)) // debugging
+    .map(n -> n * 10)
+    .collect(Collectors.toList());
+
+The Important Terminal Operations
+collect(Collector) — the most versatile terminal operation. Accumulates elements into a container. Almost always used with Collectors utility class.
+java// toList, toSet, toMap
+List<String> list = stream.collect(Collectors.toList());
+Set<String> set   = stream.collect(Collectors.toSet());
+
+// joining — for Strings
+String joined = Stream.of("a","b","c").collect(Collectors.joining(", ", "[", "]")); // [a, b, c]
+
+// groupingBy — interview favourite
+Map<Integer, List<String>> byLength = Stream.of("Hi","Hello","Hey","Bye")
+    .collect(Collectors.groupingBy(String::length));
+// {2: ["Hi"], 5: ["Hello"], 3: ["Hey", "Bye"]}
+
+// counting downstream
+Map<Integer, Long> countByLength = Stream.of("Hi","Hello","Hey","Bye")
+    .collect(Collectors.groupingBy(String::length, Collectors.counting()));
+// {2: 1, 5: 1, 3: 2}
+
+// partitioningBy — splits into true/false groups
+Map<Boolean, List<Integer>> parts = Stream.of(1,2,3,4,5)
+    .collect(Collectors.partitioningBy(n -> n % 2 == 0));
+// {true: [2,4], false: [1,3,5]}
+reduce(identity, BinaryOperator) — collapses all elements into a single value by repeatedly applying a function.
+javaint sum = Stream.of(1,2,3,4,5).reduce(0, Integer::sum); // 0+1+2+3+4+5 = 15
+
+// Without identity — returns Optional because stream could be empty
+Optional<Integer> max = Stream.of(3,1,4,1,5).reduce((a, b) -> a > b ? a : b);
+forEach(Consumer) — iterates and does something; returns void, can't chain after it.
+count() — returns long count of elements.
+findFirst() and findAny() — both return Optional<T>. findFirst() always returns the first element (deterministic). findAny() returns any element, and is faster in parallel streams because it doesn't enforce ordering.
+anyMatch(), allMatch(), noneMatch() — all take a Predicate, all return boolean, all short-circuit (stop processing as soon as the result is known).
+javaList<Integer> nums = List.of(1, 2, 3, 4, 5);
+nums.stream().anyMatch(n -> n > 4);  // true  — stops at 5
+nums.stream().allMatch(n -> n > 0);  // true  — checks all
+nums.stream().noneMatch(n -> n > 10); // true — stops early if any match found
+min() and max() — take a Comparator, return Optional<T>.
+javaOptional<String> shortest = Stream.of("Alice", "Bob", "Charlie")
+    .min(Comparator.comparingInt(String::length)); // Optional["Bob"]
+
+Parallel Streams — Know the Trade-offs
+parallelStream() or .parallel() splits the data across multiple CPU cores using the ForkJoin pool. It sounds great but use it carefully.
+Use it when: the dataset is large, the operations are CPU-intensive, and there are no shared mutable state or ordering concerns.
+Avoid it when: the dataset is small (thread coordination overhead exceeds the gain), operations have side effects, or you need guaranteed encounter order. In most typical business applications, sequential streams are faster.
+
+
+----------------------------------------------------------------------------------------
+
