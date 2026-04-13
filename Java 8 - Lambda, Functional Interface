@@ -1,0 +1,188 @@
+🚀 1. Lambda Expression (Easy Explanation)
+✅ What is Lambda?
+
+A lambda expression is a short way to write a function (method) without creating a class or method explicitly.
+
+👉 Think: “inline function”
+
+🔹 Syntax
+(parameters) -> { body }
+🔹 Example (Before Lambda - Anonymous Class)
+Runnable r = new Runnable() {
+    @Override
+    public void run() {
+        System.out.println("Running");
+    }
+};
+🔹 Same using Lambda
+Runnable r = () -> System.out.println("Running");
+// No class, no override, very concise
+🔹 Another Example
+// Add two numbers
+BiFunction<Integer, Integer, Integer> add = (a, b) -> a + b;
+
+System.out.println(add.apply(2, 3)); // 5
+🧠 Key Points
+Removes boilerplate code
+Used with functional interfaces only
+Improves readability
+🚀 2. Functional Interface
+✅ What is Functional Interface?
+
+An interface with exactly ONE abstract method
+
+@FunctionalInterface
+interface MyInterface {
+    void sayHello();  // Only one abstract method
+}
+🔹 Example with Lambda
+MyInterface obj = () -> System.out.println("Hello");
+
+obj.sayHello();
+🧠 Key Points
+Can have:
+Multiple default methods
+Multiple static methods
+But only one abstract method
+❗ Invalid Example
+interface Test {
+    void a();
+    void b(); // ❌ Not functional interface (2 abstract methods)
+}
+🚀 3. Built-in Functional Interfaces (VERY IMPORTANT)
+
+These are in java.util.function
+
+🔹 1. Function<T, R>
+
+👉 Takes input → returns output
+
+Function<Integer, Integer> square = x -> x * x;
+
+System.out.println(square.apply(5)); // 25
+🔹 2. Predicate<T>
+
+👉 Takes input → returns boolean
+
+Predicate<Integer> isEven = x -> x % 2 == 0;
+
+System.out.println(isEven.test(4)); // true
+🔹 3. Consumer<T>
+
+👉 Takes input → returns nothing
+
+Consumer<String> print = s -> System.out.println(s);
+
+print.accept("Hello");
+🔹 4. Supplier<T>
+
+👉 Takes no input → returns value
+
+Supplier<Double> random = () -> Math.random();
+
+System.out.println(random.get());
+🔥 Summary Table
+Interface	Input	Output
+Function	Yes	Yes
+Predicate	Yes	Boolean
+Consumer	Yes	No
+Supplier	No	Yes
+🚀 4. Functional Programming (In Java)
+✅ What is it?
+
+A programming style where:
+
+Functions are treated as first-class citizens
+Focus on what to do, not how
+🔹 Example (Imperative vs Functional)
+❌ Traditional (Imperative)
+List<Integer> list = Arrays.asList(1,2,3,4,5);
+
+for (int i : list) {
+    if (i % 2 == 0) {
+        System.out.println(i);
+    }
+}
+✅ Functional (Using Lambda + Stream)
+list.stream()
+    .filter(x -> x % 2 == 0) // condition
+    .forEach(System.out::println); // action
+🧠 Key Concepts
+Immutability (avoid changing data)
+Pure functions (same input → same output)
+Declarative style
+🚀 5. Important Interview Questions & Answers
+🔥 Q1: What is a Lambda Expression?
+
+👉 Answer:
+A lambda expression is a concise way to represent a function using the syntax (args) -> body, mainly used to implement functional interfaces.
+
+🔥 Q2: Why Lambda requires Functional Interface?
+
+👉 Answer:
+Because Java needs a target type to map the lambda to a method. Functional interface provides exactly one abstract method → no ambiguity.
+
+🔥 Q3: Difference: Lambda vs Anonymous Class?
+Feature	Lambda	Anonymous Class
+Syntax	Short	Verbose
+this keyword	Refers to outer class	Refers to inner class
+Performance	Better	Slight overhead
+🔥 Q4: Can Lambda access local variables?
+
+👉 Yes, but only effectively final variables
+
+int x = 10;
+
+Runnable r = () -> {
+    // x = 20; ❌ not allowed
+    System.out.println(x); // ✅
+};
+🔥 Q5: What is “effectively final”?
+
+👉 Variable whose value is not changed after initialization
+
+🔥 Q6: What is Functional Interface?
+
+👉 Interface with one abstract method, used as target for lambda expressions.
+
+🔥 Q7: Can Functional Interface have multiple methods?
+
+👉 Yes:
+
+Only 1 abstract
+Multiple default & static allowed
+🔥 Q8: Difference: Function vs Predicate?
+
+👉
+
+Function → returns any type
+Predicate → returns boolean
+🔥 Q9: Why use Functional Programming?
+
+👉 Benefits:
+
+Cleaner code
+Less bugs (immutability)
+Better for parallel processing
+🔥 Q10: Real-world usage?
+
+👉 In:
+
+Streams API
+Event handling
+Sorting (Comparator)
+Filtering collections
+🚀 6. Common Interview Traps
+
+⚠️ They LOVE asking these:
+
+Can lambda have multiple statements?
+👉 Yes (use {})
+(x) -> {
+    System.out.println(x);
+    return x * 2;
+}
+Can we throw checked exception in lambda?
+👉 Not directly (needs handling)
+Can we create our own functional interface?
+👉 Yes (very common in interviews)
